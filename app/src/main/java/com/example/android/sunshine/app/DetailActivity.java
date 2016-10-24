@@ -89,8 +89,8 @@ public class DetailActivity extends AppCompatActivity {
 
         PutDataMapRequest putDataMapReq = PutDataMapRequest.create("/updateWear");
         putDataMapReq.getDataMap().putLong("date_time", steps);
-        putDataMapReq.getDataMap().putDouble("high_temperature", fake2);
-        putDataMapReq.getDataMap().putDouble("low_temperature", fake3);
+        putDataMapReq.getDataMap().putString("high_temperature", "60");
+        putDataMapReq.getDataMap().putString("low_temperature", "40");
         putDataMapReq.getDataMap().putInt("weather_id", 800);
         PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
         PendingResult<DataApi.DataItemResult> pendingResult =
