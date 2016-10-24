@@ -9,6 +9,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.wearable.activity.WearableActivity;
 import android.support.wearable.view.BoxInsetLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
@@ -24,14 +25,19 @@ public class MainActivity extends WearableActivity {
 
     private static final SimpleDateFormat AMBIENT_DATE_FORMAT = new SimpleDateFormat("HH:mm", Locale.US);
     private BoxInsetLayout mContainerView;
+    private TextView textViewHigh;
+    private TextView textViewLow;
     private TextView mClockView;
+    private TextView textViewDate;
+    private ImageView imageIcon;
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Double high = intent.getDoubleExtra(HIGH, 0.0);
-            Double low = intent.getDoubleExtra(LOW, 0.0);
+            String high = intent.getStringExtra(HIGH);
+            String low = intent.getStringExtra(LOW);
             int weatherId = intent.getIntExtra(WEATHER_ID, 0);
+            updateWeatherInfo(high, low, weatherId);
         }
     };
 
@@ -43,6 +49,10 @@ public class MainActivity extends WearableActivity {
 
         mContainerView = (BoxInsetLayout) findViewById(R.id.container);
         mClockView = (TextView) findViewById(R.id.clock);
+        textViewHigh = (TextView) findViewById(R.id.textViewHigh);
+        textViewLow = (TextView) findViewById(R.id.textViewLow);
+        imageIcon = (ImageView) findViewById(R.id.detail_icon);
+        textViewDate = (TextView) findViewById(R.id.textViewDate);
         updateDisplay();
     }
 
@@ -55,7 +65,7 @@ public class MainActivity extends WearableActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(broadcastReceiver);
+        LocalBroadcastManager.getInstance(MainActivity.this).unregisterReceiver(broadcastReceiver);
     }
 
     @Override
@@ -74,6 +84,13 @@ public class MainActivity extends WearableActivity {
     public void onExitAmbient() {
         updateDisplay();
         super.onExitAmbient();
+    }
+
+    private void updateWeatherInfo(String high_temperature, String low_temperature, int ImageId) {
+        textViewLow.setText(low_temperature);
+        textViewHigh.setText(high_temperature);
+        textViewDate.setText(Utility.getFullFriendlyDayString(this, System.currentTimeMillis()));
+        imageIcon.setImageResource(Utility.getArtResourceForWeatherCondition(ImageId));
     }
 
     private void updateDisplay() {

@@ -19,33 +19,37 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="15dp"
             android:textColor="@android:color/white"
-            android:textSize="25sp"
+            android:textSize="50sp"
             android:visibility="visible"
             app:layout_box="all"
             tools:text="18:14" />
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/textViewDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            tools:text="FRI, JUL 14 2015" />
+            android:textColor="@android:color/white"
+            tools:text="FRI, JUL 14 2015"
+            android:layout_marginTop="10dp"
+            android:textSize="15sp" />
 
         <View
             android:layout_width="50dp"
             android:layout_height="1dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="5dp"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="20dp"
             android:background="@android:color/white" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginTop="20dp">
 
             <ImageView
                 android:id="@+id/detail_icon"
@@ -53,21 +57,27 @@
                 android:layout_height="30dp"
                 android:adjustViewBounds="true"
                 android:contentDescription="@string/weather_description"
-                tools:src="@drawable/art_clouds" />
+                tools:src="@drawable/art_clouds"
+                android:layout_marginRight="10dp" />
 
             <TextView
                 android:id="@+id/textViewHigh"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                tools:text="25" />
+                android:textColor="@android:color/white"
+                tools:text="25"
+                android:textSize="25sp"
+                android:layout_marginRight="10dp" />
 
             <TextView
                 android:id="@+id/textViewLow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                tools:text="16" />
+                android:textColor="@android:color/white"
+                tools:text="16"
+                android:textSize="25sp" />
 
         </LinearLayout>
 

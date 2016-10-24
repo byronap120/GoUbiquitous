@@ -91,7 +91,7 @@ public class DetailActivity extends AppCompatActivity {
         putDataMapReq.getDataMap().putLong("date_time", steps);
         putDataMapReq.getDataMap().putDouble("high_temperature", fake2);
         putDataMapReq.getDataMap().putDouble("low_temperature", fake3);
-        putDataMapReq.getDataMap().putInt("weather_id", 5);
+        putDataMapReq.getDataMap().putInt("weather_id", 800);
         PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
         PendingResult<DataApi.DataItemResult> pendingResult =
                 Wearable.DataApi.putDataItem(mGoogleApiClient, putDataReq);

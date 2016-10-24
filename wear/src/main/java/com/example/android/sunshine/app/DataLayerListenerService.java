@@ -41,8 +41,8 @@ public class DataLayerListenerService extends WearableListenerService {
     private void getDataItemsAndSendLocalBroadcast(DataMap dataMap) {
         Log.i(LOG_TAG, "sending broadcast");
         Intent in = new Intent();
-        in.putExtra(HIGH, dataMap.getDouble(HIGH));
-        in.putExtra(LOW, dataMap.getDouble(LOW));
+        in.putExtra(HIGH, dataMap.getString(HIGH));
+        in.putExtra(LOW, dataMap.getString(LOW));
         in.putExtra(WEATHER_ID, dataMap.getInt(WEATHER_ID));
         in.setAction(ACTION_FILTER);
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(in);
