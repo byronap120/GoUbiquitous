@@ -29,10 +29,12 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
 import android.text.format.Time;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.WindowInsets;
 
@@ -65,16 +67,6 @@ public class MyWatchFace extends CanvasWatchFaceService {
     static public final String ACTION_FILTER = "weatherNewData";
 
 
-    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String high = intent.getStringExtra(HIGH);
-            String low = intent.getStringExtra(LOW);
-            int weatherId = intent.getIntExtra(WEATHER_ID, 0);
-        }
-    };
-
-
     @Override
     public Engine onCreateEngine() {
         return new Engine();
@@ -105,8 +97,29 @@ public class MyWatchFace extends CanvasWatchFaceService {
         boolean mRegisteredTimeZoneReceiver = false;
         Paint mBackgroundPaint;
         Paint mTextPaint;
+        Paint highTextPaint;
+        Paint lowTextPaint;
+        Paint dateTextPaint;
+        Paint imageIconPaint;
+        String highString;
+        String lowString;
+        String dateString;
+        int weatherIdValue;
+
         boolean mAmbient;
         Time mTime;
+
+        private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.i("com.byron.watch;", "broadcastReceiver WatchFace");
+                highString = intent.getStringExtra(HIGH);
+                lowString = intent.getStringExtra(LOW);
+                weatherIdValue = intent.getIntExtra(WEATHER_ID, 0);
+                invalidate();
+            }
+        };
+
         final BroadcastReceiver mTimeZoneReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -139,10 +152,18 @@ public class MyWatchFace extends CanvasWatchFaceService {
             mYOffset = resources.getDimension(R.dimen.digital_y_offset);
 
             mBackgroundPaint = new Paint();
-            mBackgroundPaint.setColor(resources.getColor(R.color.background));
+            mBackgroundPaint.setColor(ContextCompat.getColor(getBaseContext(), R.color.background));
 
-            mTextPaint = new Paint();
-            mTextPaint = createTextPaint(resources.getColor(R.color.digital_text));
+            mTextPaint = createTextPaint(ContextCompat.getColor(getBaseContext(), R.color.digital_text));
+            highTextPaint = createTextPaint(ContextCompat.getColor(getBaseContext(), R.color.digital_text));
+            lowTextPaint = createTextPaint(ContextCompat.getColor(getBaseContext(), R.color.digital_text_dark));
+            dateTextPaint = createTextPaint(ContextCompat.getColor(getBaseContext(), R.color.digital_text));
+            imageIconPaint = new Paint();
+
+            highString = "";
+            lowString = "";
+            weatherIdValue = -1;
+            dateString = Utility.getFullFriendlyDayString(getBaseContext(), System.currentTimeMillis());
 
             mTime = new Time();
         }
@@ -188,7 +209,6 @@ public class MyWatchFace extends CanvasWatchFaceService {
             IntentFilter filter = new IntentFilter(Intent.ACTION_TIMEZONE_CHANGED);
             MyWatchFace.this.registerReceiver(mTimeZoneReceiver, filter);
 
-            //MyWatchFace.this.registerReceiver(broadcastReceiver, new IntentFilter(ACTION_FILTER));
             LocalBroadcastManager.getInstance(MyWatchFace.this).registerReceiver(broadcastReceiver, new IntentFilter(ACTION_FILTER));
         }
 
@@ -214,7 +234,16 @@ public class MyWatchFace extends CanvasWatchFaceService {
             float textSize = resources.getDimension(isRound
                     ? R.dimen.digital_text_size_round : R.dimen.digital_text_size);
 
+            float dateTextSize = resources.getDimension(isRound
+                    ? R.dimen.date_text_size_round : R.dimen.date_text_size);
+
+            float temperatureTextSize = resources.getDimension(isRound
+                    ? R.dimen.temperature_text_size_round : R.dimen.temperature_text_size);
+
             mTextPaint.setTextSize(textSize);
+            dateTextPaint.setTextSize(dateTextSize);
+            lowTextPaint.setTextSize(temperatureTextSize);
+            highTextPaint.setTextSize(temperatureTextSize);
         }
 
         @Override
@@ -236,6 +265,9 @@ public class MyWatchFace extends CanvasWatchFaceService {
                 mAmbient = inAmbientMode;
                 if (mLowBitAmbient) {
                     mTextPaint.setAntiAlias(!inAmbientMode);
+                    dateTextPaint.setAntiAlias(!inAmbientMode);
+                    lowTextPaint.setAntiAlias(!inAmbientMode);
+                    highTextPaint.setAntiAlias(!inAmbientMode);
                 }
                 invalidate();
             }
@@ -249,25 +281,6 @@ public class MyWatchFace extends CanvasWatchFaceService {
          * Captures tap event (and tap type) and toggles the background color if the user finishes
          * a tap.
          */
-        @Override
-        public void onTapCommand(int tapType, int x, int y, long eventTime) {
-            Resources resources = MyWatchFace.this.getResources();
-            switch (tapType) {
-                case TAP_TYPE_TOUCH:
-                    // The user has started touching the screen.
-                    break;
-                case TAP_TYPE_TOUCH_CANCEL:
-                    // The user has started a different gesture or otherwise cancelled the tap.
-                    break;
-                case TAP_TYPE_TAP:
-                    // The user has completed the tap gesture.
-                    mTapCount++;
-                    mBackgroundPaint.setColor(resources.getColor(mTapCount % 2 == 0 ?
-                            R.color.background : R.color.background2));
-                    break;
-            }
-            invalidate();
-        }
 
         @Override
         public void onDraw(Canvas canvas, Rect bounds) {
@@ -280,13 +293,28 @@ public class MyWatchFace extends CanvasWatchFaceService {
 
             // Draw H:MM in ambient mode or H:MM:SS in interactive mode.
             mTime.setToNow();
-            String text = mAmbient
-                    ? String.format("%d:%02d", mTime.hour, mTime.minute)
-                    : String.format("%d:%02d:%02d", mTime.hour, mTime.minute, mTime.second);
+            String text = String.format("%d:%02d", mTime.hour, mTime.minute);
 
+            //Time
+            float centerTimeText = bounds.centerX() - (mTextPaint.measureText(text) / 2);
+            canvas.drawText(text, centerTimeText, mYOffset, mTextPaint);
 
-            canvas.drawText(text, mXOffset, mYOffset, mTextPaint);
-            canvas.drawText("luciita", mXOffset, mYOffset, mTextPaint);
+            //Date
+            float centerDateText = bounds.centerX() - (dateTextPaint.measureText(dateString) / 2);
+            float axisYOffsetDateText = centerTimeText + mTextPaint.getTextSize() + 15;
+            canvas.drawText(dateString, centerDateText, axisYOffsetDateText, dateTextPaint);
+
+            //Low and High Temperatures
+            float axisYOffsetTemperature = axisYOffsetDateText + dateTextPaint.getTextSize() + 30;
+            float lowTextWidth = lowTextPaint.measureText(lowString);
+            float highTextWidth = highTextPaint.measureText(highString);
+            float axisXOffsetTemperature = bounds.centerX() - (lowTextWidth + highTextWidth + 15) / 2;
+            canvas.drawText(highString, axisXOffsetTemperature, axisYOffsetTemperature, highTextPaint);
+            float axisXOffsetTemperature2 = axisXOffsetTemperature + highTextWidth + 15;
+            canvas.drawText(lowString, axisXOffsetTemperature2, axisYOffsetTemperature, lowTextPaint);
+
+            
+
         }
 
         /**

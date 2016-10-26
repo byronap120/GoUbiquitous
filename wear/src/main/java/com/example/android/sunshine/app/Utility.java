@@ -24,7 +24,7 @@ public class Utility {
     public static int getArtResourceForWeatherCondition(int weatherId) {
         // Based on weather code data found at:
         // http://bugs.openweathermap.org/projects/api/wiki/Weather_Condition_Codes
-        if (weatherId >= 200 && weatherId <= 232) {
+/*        if (weatherId >= 200 && weatherId <= 232) {
             return R.drawable.art_storm;
         } else if (weatherId >= 300 && weatherId <= 321) {
             return R.drawable.art_light_rain;
@@ -46,7 +46,7 @@ public class Utility {
             return R.drawable.art_light_clouds;
         } else if (weatherId >= 802 && weatherId <= 804) {
             return R.drawable.art_clouds;
-        }
+        }*/
         return -1;
     }
 
