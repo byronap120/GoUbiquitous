@@ -21,6 +21,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -301,11 +303,11 @@ public class MyWatchFace extends CanvasWatchFaceService {
 
             //Date
             float centerDateText = bounds.centerX() - (dateTextPaint.measureText(dateString) / 2);
-            float axisYOffsetDateText = centerTimeText + mTextPaint.getTextSize() + 15;
+            float axisYOffsetDateText = centerTimeText + mTextPaint.getTextSize() + 20;
             canvas.drawText(dateString, centerDateText, axisYOffsetDateText, dateTextPaint);
 
             //Low and High Temperatures
-            float axisYOffsetTemperature = axisYOffsetDateText + dateTextPaint.getTextSize() + 30;
+            float axisYOffsetTemperature = axisYOffsetDateText + dateTextPaint.getTextSize() + 50;
             float lowTextWidth = lowTextPaint.measureText(lowString);
             float highTextWidth = highTextPaint.measureText(highString);
             float axisXOffsetTemperature = bounds.centerX() - (lowTextWidth + highTextWidth + 15) / 2;
@@ -313,8 +315,14 @@ public class MyWatchFace extends CanvasWatchFaceService {
             float axisXOffsetTemperature2 = axisXOffsetTemperature + highTextWidth + 15;
             canvas.drawText(lowString, axisXOffsetTemperature2, axisYOffsetTemperature, lowTextPaint);
 
-            
-
+            //iconImage
+            int resImageIcon = Utility.getArtResourceForWeatherCondition(weatherIdValue);
+            if (resImageIcon != -1) {
+                Bitmap imageIcon = BitmapFactory.decodeResource(getResources(), resImageIcon);
+                float axisXOffsetIcon = bounds.centerX() - (imageIcon.getWidth() / 2);
+                float axisYOffsetIcon = axisYOffsetTemperature + 10;
+                canvas.drawBitmap(imageIcon, axisXOffsetIcon, axisYOffsetIcon, imageIconPaint);
+            }
         }
 
         /**
