@@ -1,7 +1,12 @@
-Advanced Android Sample App
+Advanced Android Sample App + Android WatchFace
 ===================================
 
 Synchronizes weather information from OpenWeatherMap on Android Phones and Tablets. Used in the Udacity Advanced Android course.
+
+Android WatchFace was added for this to complete project 6. This is an example of the final result:
+
+<img src='http://i.imgur.com/LrSklB2.png' title='Circular WatchFace' />
+<img src='http://i.imgur.com/l4rQBDC.png' title='WatchFace'  />
 
 Pre-requisites
 --------------
@@ -16,11 +21,16 @@ Android Support RecyclerView 22.2.0
 Google Play Services GCM 7.0.0
 BumpTech Glide 3.5.2
 
-
 Getting Started
 ---------------
 This sample uses the Gradle build system.  To build this project, use the
 "gradlew build" command or use "Import Project" in Android Studio.
+
+please create an api key on https://openweathermap.org/appid an add to build.gradle on app module:
+  
+```javas
+it.buildConfigField 'String', 'OPEN_WEATHER_MAP_API_KEY', MyOpenWeatherMapApiKey
+```
 
 Support
 -------
