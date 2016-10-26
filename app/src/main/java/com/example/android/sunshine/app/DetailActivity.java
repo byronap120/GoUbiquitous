@@ -18,13 +18,7 @@ package com.example.android.sunshine.app;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.wearable.DataApi;
-import com.google.android.gms.wearable.PutDataMapRequest;
-import com.google.android.gms.wearable.PutDataRequest;
-import com.google.android.gms.wearable.Wearable;
 
 public class DetailActivity extends AppCompatActivity {
 
@@ -53,49 +47,6 @@ public class DetailActivity extends AppCompatActivity {
             // Being here means we are in animation mode
             supportPostponeEnterTransition();
         }
-
-        initializeDataItems();
     }
-
-    private void initializeDataItems() {
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
-                    @Override
-                    public void onConnected(Bundle connectionHint) {
-                    }
-
-                    @Override
-                    public void onConnectionSuspended(int cause) {
-                    }
-                })
-                .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
-                    @Override
-                    public void onConnectionFailed(ConnectionResult result) {
-                    }
-                })
-                .addApi(Wearable.API)
-                .build();
-        mGoogleApiClient.connect();
-        syncConfiguration(System.currentTimeMillis());
-    }
-
-    private void syncConfiguration(Long steps) {
-        if (mGoogleApiClient == null)
-            return;
-
-        int fake1 = 1;
-        double fake2 = 50;
-        double fake3 = 9;
-
-        PutDataMapRequest putDataMapReq = PutDataMapRequest.create("/updateWear");
-        putDataMapReq.getDataMap().putLong("date_time", steps);
-        putDataMapReq.getDataMap().putString("high_temperature", "60");
-        putDataMapReq.getDataMap().putString("low_temperature", "40");
-        putDataMapReq.getDataMap().putInt("weather_id", 800);
-        PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
-        PendingResult<DataApi.DataItemResult> pendingResult =
-                Wearable.DataApi.putDataItem(mGoogleApiClient, putDataReq);
-    }
-
 
 }

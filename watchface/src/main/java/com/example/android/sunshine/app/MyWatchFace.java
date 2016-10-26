@@ -40,6 +40,14 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.WindowInsets;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
+import com.google.android.gms.wearable.Wearable;
+
 import java.lang.ref.WeakReference;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
@@ -95,6 +103,7 @@ public class MyWatchFace extends CanvasWatchFaceService {
     }
 
     private class Engine extends CanvasWatchFaceService.Engine {
+        static private final String WEAR_PATH = "/wakeMessage";
         final Handler mUpdateTimeHandler = new EngineHandler(this);
         boolean mRegisteredTimeZoneReceiver = false;
         Paint mBackgroundPaint;
@@ -107,6 +116,7 @@ public class MyWatchFace extends CanvasWatchFaceService {
         String lowString;
         String dateString;
         int weatherIdValue;
+        private GoogleApiClient mGoogleApiClient;
 
         boolean mAmbient;
         Time mTime;
@@ -114,7 +124,6 @@ public class MyWatchFace extends CanvasWatchFaceService {
         private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                Log.i("com.byron.watch;", "broadcastReceiver WatchFace");
                 highString = intent.getStringExtra(HIGH);
                 lowString = intent.getStringExtra(LOW);
                 weatherIdValue = intent.getIntExtra(WEATHER_ID, 0);
@@ -168,6 +177,8 @@ public class MyWatchFace extends CanvasWatchFaceService {
             dateString = Utility.getFullFriendlyDayString(getBaseContext(), System.currentTimeMillis());
 
             mTime = new Time();
+
+            initializeDataItems();
         }
 
         @Override
@@ -356,5 +367,39 @@ public class MyWatchFace extends CanvasWatchFaceService {
                 mUpdateTimeHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, delayMs);
             }
         }
+
+        private void initializeDataItems() {
+            mGoogleApiClient = new GoogleApiClient.Builder(getBaseContext())
+                    .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+                        @Override
+                        public void onConnected(Bundle connectionHint) {
+                        }
+
+                        @Override
+                        public void onConnectionSuspended(int cause) {
+                        }
+                    })
+                    .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
+                        @Override
+                        public void onConnectionFailed(ConnectionResult result) {
+                        }
+                    })
+                    .addApi(Wearable.API)
+                    .build();
+            mGoogleApiClient.connect();
+            sendWakeMessageToPhoneDevice(System.currentTimeMillis());
+        }
+
+        private void sendWakeMessageToPhoneDevice(Long steps) {
+            if (mGoogleApiClient == null)
+                return;
+            Log.i("com.byron.test", "sendWakeMessageToPhoneDevice");
+            PutDataMapRequest putDataMapReq = PutDataMapRequest.create(WEAR_PATH);
+            putDataMapReq.getDataMap().putLong("date_time", System.currentTimeMillis());
+            PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
+            PendingResult<DataApi.DataItemResult> pendingResult =
+                    Wearable.DataApi.putDataItem(mGoogleApiClient, putDataReq);
+        }
+
     }
 }

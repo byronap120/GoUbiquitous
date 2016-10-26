@@ -36,7 +36,6 @@ public class DataItemListenerService extends WearableListenerService {
     }
 
     private void getDataItemsAndSendLocalBroadcast(DataMap dataMap) {
-        Log.i(LOG_TAG, "sending broadcast");
         Intent in = new Intent();
         in.putExtra(HIGH, dataMap.getString(HIGH));
         in.putExtra(LOW, dataMap.getString(LOW));
